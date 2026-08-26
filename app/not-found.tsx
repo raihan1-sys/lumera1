@@ -1,0 +1,1 @@
+import Link from 'next/link';export default function NotFound(){return <div className="checkout-success"><p>NOT FOUND</p><h1>This collection moved somewhere else.</h1><span>The page you requested does not exist in the Lumera catalog.</span><Link className="gold-button" href="/shop">RETURN TO SHOP</Link></div>}

@@ -1,0 +1,7 @@
+'use client';
+import {createContext,useContext,useEffect,useMemo,useState} from 'react';
+type CartItem={id:number;slug:string;name:string;price:number;image:string;qty:number};
+type Store={cart:CartItem[];wish:number[];addCart:(p:any,qty?:number)=>void;removeCart:(id:number)=>void;setQty:(id:number,qty:number)=>void;toggleWish:(id:number)=>void;clearCart:()=>void};
+const C=createContext<Store|null>(null);
+export function StoreProvider({children}:{children:React.ReactNode}){const [cart,setCart]=useState<CartItem[]>([]);const [wish,setWish]=useState<number[]>([]);useEffect(()=>{try{setCart(JSON.parse(localStorage.getItem('lumera-cart')||'[]'));setWish(JSON.parse(localStorage.getItem('lumera-wish')||'[]'))}catch{}},[]);useEffect(()=>localStorage.setItem('lumera-cart',JSON.stringify(cart)),[cart]);useEffect(()=>localStorage.setItem('lumera-wish',JSON.stringify(wish)),[wish]);const value=useMemo(()=>({cart,wish,addCart:(p:any,qty:number=1)=>setCart(x=>{const e=x.find(i=>i.id===p.id);return e?x.map(i=>i.id===p.id?{...i,qty:i.qty+qty}:i):[...x,{id:p.id,slug:p.slug,name:p.name,price:p.price,image:p.image,qty}]}),removeCart:(id:number)=>setCart(x=>x.filter(i=>i.id!==id)),setQty:(id:number,qty:number)=>setCart(x=>x.map(i=>i.id===id?{...i,qty:Math.max(1,qty)}:i)),toggleWish:(id:number)=>setWish(x=>x.includes(id)?x.filter(i=>i!==id):[...x,id]),clearCart:()=>setCart([])}),[cart,wish]);return <C.Provider value={value}>{children}</C.Provider>}
+export const useStore=()=>{const v=useContext(C);if(!v)throw new Error('Store missing');return v};
